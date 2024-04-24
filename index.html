@@ -3,54 +3,35 @@
 <head>
     <title>Interactive Features</title>
     <style>
-        .card {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
-            margin: 15px;
-            cursor: pointer;
-            transition: 0.3s;
+        ul {
+            list-style-type: none;
+            padding: 0;
         }
-        .card:hover {
-            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        li {
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <div id="features">
-        <!-- Features will be loaded here -->
-    </div>
-
-    <script>
-        const features = [
-            'Turn on lights',
-            'Turn off lights',
-            'Turn light red',
-            'Turn light green',
-            'Turn light blue',
-            'Boogie bomb',
-            'What the sigma',
-            'Play young boy',
-            'Play Beethoven',
-            'Set 10 second timer',
-            'Turn on fan',
-            'Turn off fan',
-            'Relax nature',
-            'Relax rain'
-        ];
-
-        const featuresContainer = document.getElementById('features');
-
-        features.forEach(feature => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.textContent = feature;
-            card.addEventListener('click', () => {
-                // Add functionality for each feature here
-                console.log(`Feature clicked: ${feature}`);
-            });
-            featuresContainer.appendChild(card);
-        });
-    </script>
+    <h1>Voice commands</h1>
+    <ul>
+        <li>Turn on lights</li>
+        <li>Turn off lights</li>
+        <li>Turn light red</li>
+        <li>Turn light green</li>
+        <li>Turn light blue</li>
+        <li>Boogie bomb</li>
+        <li>What the sigma</li>
+        <li>Play young boy</li>
+        <li>Play Beethoven</li>
+        <li>Set 10 second timer</li>
+        <li>Turn on fan</li>
+        <li>Turn off fan</li>
+        <li>Relax nature</li>
+        <li>Relax rain</li>
+    </ul>
 </body>
 </html>
