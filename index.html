@@ -1,9 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Hello, World!</title>
+    <title>Interactive Features</title>
+    <style>
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .card:hover {
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello, World!</h1>
+    <div id="features">
+        <!-- Features will be loaded here -->
+    </div>
+
+    <script>
+        const features = [
+            'Turn on lights',
+            'Turn off lights',
+            'Turn light red',
+            'Turn light green',
+            'Turn light blue',
+            'Boogie bomb',
+            'What the sigma',
+            'Play young boy',
+            'Play Beethoven',
+            'Set 10 second timer',
+            'Turn on fan',
+            'Turn off fan',
+            'Relax nature',
+            'Relax rain'
+        ];
+
+        const featuresContainer = document.getElementById('features');
+
+        features.forEach(feature => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.textContent = feature;
+            card.addEventListener('click', () => {
+                // Add functionality for each feature here
+                console.log(`Feature clicked: ${feature}`);
+            });
+            featuresContainer.appendChild(card);
+        });
+    </script>
 </body>
 </html>
