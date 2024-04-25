@@ -59,6 +59,7 @@
 
         .parentContainer {
             display: flex;
+            align-items: stretch;
             justify-content: space-between;
         }
 
@@ -73,6 +74,7 @@
             margin-right: auto;
             color: white;
             margin-right: 1rem;
+            margin-bottom: 0px;
         }
 
         .CommandContainer {
@@ -85,6 +87,42 @@
             margin-right: auto;
             color: white;
             margin-left: 1rem;
+        }
+
+        .HowItWorksContainer {
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-image: linear-gradient(to bottom, var(--card-bg-start), var(--card-bg-end));
+            box-shadow: 0 0 10px var(--box-shadow-color);
+            width : 66rem;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 20px;
+            color: white;
+        }
+
+        .videoContainer {
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-image: linear-gradient(to bottom, var(--card-bg-start), var(--card-bg-end));
+            box-shadow: 0 0 10px var(--box-shadow-color);
+            width : 66rem;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
+
+        iframe {
+            border-radius: 10px;
+            box-shadow: 0 0 10px var(--box-shadow-color);
+            margin-bottom: 20px;
         }
 
         
@@ -181,6 +219,14 @@
                 </ol>
             </ul>
         </div>
+    </div>
+    <div class="HowItWorksContainer">
+        <h1>How It Works:</h1>
+        <img src="./system.png" alt="Schematic Image">
+    </div>
+    <div class="videoContainer">
+        <h1>Video Demo:</h1>
+        <iframe width="672" height="378" src="https://www.youtube.com/embed/XzJx-jYExxY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
 </body>
 </html>
