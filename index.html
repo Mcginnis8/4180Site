@@ -6,7 +6,7 @@
         :root {
         --card-bg-start: #001329;
         --card-bg-end: #00012b;
-        --box-shadow-color: rgba(0, 0, 0, 0.5);        
+        --box-shadow-color: rgba(39, 39, 39, 0.5);        
     }
 
         body {
@@ -20,7 +20,7 @@
             margin-bottom: 20px;
             background-image: linear-gradient(to bottom, var(--card-bg-start), var(--card-bg-end));
             box-shadow: 0 0 10px var(--box-shadow-color);
-            width : 40rem;
+            width : 66rem;
             margin-left: auto;
             margin-right: auto;
         }
@@ -42,6 +42,24 @@
             width: 80%;
             border-radius: 10px;
             box-shadow: 0 0 10px var(--box-shadow-color);
+            margin-bottom: 3rem;
+        }
+
+        .SchematicContainer {
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-image: linear-gradient(to bottom, var(--card-bg-start), var(--card-bg-end));
+            box-shadow: 0 0 10px var(--box-shadow-color);
+            width : 66rem;
+            margin-left: auto;
+            margin-right: auto;
+            color: white;
+        }
+
+        .parentContainer {
+            display: flex;
+            justify-content: space-between;
         }
 
         .partsContainer {
@@ -50,10 +68,11 @@
             margin-bottom: 20px;
             background-image: linear-gradient(to bottom, var(--card-bg-start), var(--card-bg-end));
             box-shadow: 0 0 10px var(--box-shadow-color);
-            width : 26rem;
+            width : 31rem;
             margin-left: auto;
             margin-right: auto;
             color: white;
+            margin-right: 1rem;
         }
 
         .CommandContainer {
@@ -61,14 +80,16 @@
             padding: 20px;
             background-image: linear-gradient(to bottom, var(--card-bg-start), var(--card-bg-end));
             box-shadow: 0 0 10px var(--box-shadow-color);
-            width : 26rem;
+            width : 31rem;
             margin-left: auto;
             margin-right: auto;
             color: white;
+            margin-left: 1rem;
         }
 
         
         ul {
+            margin-top: 0px;
             list-style-position: inside;
             display: flex;
             flex-direction: column;
@@ -80,6 +101,14 @@
         .CommandContainer ul {
             padding-left: 4rem;
             padding-right: 4rem;
+        }
+
+        .CommandContainer h2 {
+            margin-bottom: 0.5rem;
+            margin-top: 0.5rem;
+            text-align: left;
+            padding-left: 2rem;
+            padding-right: 2rem;
         }
 
         ol {
@@ -100,52 +129,58 @@
 <body>
     <div class="HeaderContainer">
         <h1>AI Voice Desk Assistant</h1>
-        <h2>by: Cole McGinnis and Brooks Barahona</h2>
+        <h2>Cole McGinnis and Brooks Barahona</h2>
         <img src="./headerIMG.jpg" alt="Header Image">
     </div>
-    <div class="partsContainer">
-        <h1>Parts List:</h1>
+    <div class="SchematicContainer">
+        <h1>Schematic:</h1>
+        <img src="./circuit.png" alt="Schematic Image">
+    </div>
+    <div class="parentContainer">
+        <div class="partsContainer">
+            <h1>Parts List:</h1>
+                <ul>
+                    <li>Raspberry Pi 3 Model B</li>
+                    <li>USB Microphone (Blue Yeti)</li>
+                    <li>Bluetooth Speaker (JBL Flip 6)</li>
+                    <li>LCD 1602</li>
+                    <li>Motor Driver TB6612FNG</li>
+                    <li>1k Resistor</li>
+                    <li>10k Resistor</li>
+                    <li>Push Button</li>
+                    <li>External 5V Power Supply</li>
+                    <li>Barrel Jack 5V Supply Mount</li>
+                    <li>3x RGB LEDs</li>
+                    <li>Jumper Wires</li>
+                    <li>DC Motor</li>
+                    <li>Small Fan Blade</li>
+                </ul>
+            </div>
+        <div class="CommandContainer">
+        <h1>Voice Commands</h1>
             <ul>
-                <li>Raspberry Pi 3 Model B</li>
-                <li>USB Microphone (Blue Yeti)</li>
-                <li>Bluetooth Speaker (JBL Flip 6)</li>
-                <li>LCD 1602</li>
-                <li>Motor Driver TB6612FNG</li>
-                <li>1k Resistor</li>
-                <li>10k Resistor</li>
-                <li>Push Button</li>
-                <li>External 5V Power Supply</li>
-                <li>Barrel Jack 5V Supply Mount</li>
-                <li>3x RGB LEDs</li>
-                <li>Jumper Wires</li>
-                <li>DC Motor</li>
-                <li>Small Fan Blade</li>
+                <h2>Functional Commands:</h3>
+                <ol>
+                    <li>Turn On Lights</li>
+                    <li>Turn Off Lights</li>
+                    <li>Turn Light Red</li>
+                    <li>Turn Light Green</li>
+                    <li>Turn Light Blue</li>
+                    <li>Play Beethoven</li>
+                    <li>Set 10 Second Timer</li>
+                    <li>Turn On Fan</li>
+                    <li>Turn Off Fan</li>
+                    <li>Relax Nature</li>
+                    <li>Relax Rain</li>
+                </ol>
+                <h2>Easter Egg Commands:</h3>
+                <ol>
+                    <li>Boogie Bomb</li>
+                    <li>What the Sigma</li>
+                    <li>Play Young Boy</li>
+                </ol>
             </ul>
         </div>
-    <div class="CommandContainer">
-    <h1>Voice Commands</h1>
-        <ul>
-            <h2>Functional Commands:</h3>
-            <ol>
-                <li>Turn On Lights</li>
-                <li>Turn Off Lights</li>
-                <li>Turn Light Red</li>
-                <li>Turn Light Green</li>
-                <li>Turn Light Blue</li>
-                <li>Play Beethoven</li>
-                <li>Set 10 Second Timer</li>
-                <li>Turn On Fan</li>
-                <li>Turn Off Fan</li>
-                <li>Relax Nature</li>
-                <li>Relax Rain</li>
-            </ol>
-            <h2>Funny Commands:</h3>
-            <ol>
-                <li>Boogie Bomb</li>
-                <li>What the Sigma</li>
-                <li>Play Young Boy</li>
-            </ol>
-        </ul>
     </div>
 </body>
 </html>
