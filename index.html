@@ -101,6 +101,29 @@
             margin-top: 20px;
             color: white;
         }
+        
+        ul {
+            margin-top: 0px;
+            list-style-position: inside;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            padding-left: 5rem;
+            padding-right: 5rem;
+        }
+
+        .CommandContainer ul {
+            padding-left: 4rem;
+            padding-right: 4rem;
+        }
+
+        .CommandContainer h2 {
+            margin-bottom: 0.5rem;
+            margin-top: 0.5rem;
+            text-align: left;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
 
         .videoContainer {
             border-radius: 10px;
@@ -125,28 +148,22 @@
             margin-bottom: 20px;
         }
 
-        
-        ul {
-            margin-top: 0px;
-            list-style-position: inside;
-            display: flex;
-            flex-direction: column;
-            padding: 0;
-            padding-left: 5rem;
-            padding-right: 5rem;
+        .sourceCodeContainer {
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-image: linear-gradient(to bottom, var(--card-bg-start), var(--card-bg-end));
+            box-shadow: 0 0 10px var(--box-shadow-color);
+            width : 66rem;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .CommandContainer ul {
-            padding-left: 4rem;
-            padding-right: 4rem;
-        }
-
-        .CommandContainer h2 {
-            margin-bottom: 0.5rem;
-            margin-top: 0.5rem;
-            text-align: left;
-            padding-left: 2rem;
-            padding-right: 2rem;
+        .sourceCodeContainer code {
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
         ol {
@@ -227,6 +244,499 @@
     <div class="videoContainer">
         <h1>Video Demo:</h1>
         <iframe width="672" height="378" src="https://www.youtube.com/embed/XzJx-jYExxY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <div class="sourceCodeContainer">
+        <h1>Source Code (C++):</h1>
+        <pre id="source-code"><code class="language-cpp">
+        #include &lt;csignal&gt;
+        #include &lt;cstring&gt;
+        #include &lt;iostream&gt;
+        #include &lt;wiringPi.h&gt;
+        #include &lt;stdlib.h&gt;
+        #include &lt;thread&gt;
+        #include &lt;string&gt;
+        #include &lt;vector&gt;
+        #include &lt;fstream&gt;
+        #include &lt;stdio.h&gt;
+        #include &lt;stdlib.h&gt;
+        #include &lt;string.h&gt;
+        #include &lt;ao/ao.h&gt;
+        #include &lt;sndfile.h&gt;
+        #include &lt;thread&gt;
+        #include &lt;lcd.h&gt;
+        #include &lt;stdint.h&gt;
+
+        #define BUFFER_SIZE 4096
+
+
+        const int Button = 0;
+        const int RLED = 27;
+        const int GLED = 28;
+        const int BLED = 29;
+        const int fanPin = 1;
+
+        #define LCD_RS  25               //Register select pin
+        #define LCD_E   24               //Enable Pin
+        #define LCD_D4  23               //Data pin 4
+        #define LCD_D5  22               //Data pin 5
+        #define LCD_D6  21               //Data pin 6
+        #define LCD_D7  14               //Data pin 7
+        #define MAXTIMINGS 85
+        #define DHTPIN 7
+
+        int lcd;
+        int dht11_dat[5] = {0, 0, 0, 0, 0};
+
+
+
+        volatile sig_atomic_t signal_received = 0;
+
+        void sigint_handler(int signal) {
+        signal_received = signal;
+        }
+
+
+        void play_wav_file(char *filename)
+        {
+            SF_INFO sfinfo;
+            SNDFILE *infile = sf_open(filename, SFM_READ, &sfinfo);
+            if (!infile) {
+                printf("Failed to open file: %s\n", sf_strerror(NULL));
+                return;
+            }
+
+            ao_initialize();
+            int driver = ao_default_driver_id();
+            ao_sample_format format;
+            memset(&format, 0, sizeof(ao_sample_format)); // This line uses memset
+            format.bits = 16;
+            format.channels = sfinfo.channels;
+            format.rate = sfinfo.samplerate;
+            format.byte_format = AO_FMT_LITTLE;
+
+            ao_device *device = ao_open_live(driver, &format, NULL);
+            if (!device) {
+                printf("Failed to open device.\n");
+                return;
+            }
+
+            short buffer[BUFFER_SIZE];
+            sf_count_t items_read;
+            do {
+                items_read = sf_read_short(infile, buffer, BUFFER_SIZE);
+                ao_play(device, (char *)buffer, items_read * sizeof(short));
+            } while (items_read == BUFFER_SIZE);
+
+            ao_close(device);
+            sf_close(infile);
+            ao_shutdown();
+        }
+
+        // Function to calculate the minimum of three numbers
+        int min(int a, int b, int c) {
+            return std::min(std::min(a, b), c);
+        }
+
+        // Function to calculate the Levenshtein distance between two strings
+        int levenshteinDistance(const std::string &s1, const std::string &s2) {
+            int m = s1.size();
+            int n = s2.size();
+            std::vector&lt;std::vector&lt;int>> d(m + 1, std::vector&lt;int&lt;(n + 1));
+
+            for (int i = 0; i &lt;= m; i++) {
+                for (int j = 0; j &lt;= n; j++) {
+                    if (i == 0) {
+                        d[i][j] = j;
+                    } else if (j == 0) {
+                        d[i][j] = i;
+                    } else {
+                        int cost = (s1[i - 1] != s2[j - 1]) ? 1 : 0;
+                        d[i][j] = min(d[i - 1][j - 1] + cost, d[i][j - 1] + 1, d[i - 1][j] + 1);
+                    }
+                }
+            }
+
+            return d[m][n];
+        }
+
+        void start_main_listen() {
+            system("sudo arecord -D plughw:1,0 -f cd -r 16000 -d 3 test.wav &");
+            lcdClear(lcd);
+            lcdPosition(lcd, 0, 0);
+            lcdPrintf(lcd, "Recording");
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+            lcdClear(lcd);
+            lcdPosition(lcd, 0, 0);
+            lcdPrintf(lcd, "Processing");
+            lcdPosition(lcd, 0, 1);
+            lcdPrintf(lcd, "Please Wait");
+            system("sudo ../whisper.cpp/main -m ../whisper.cpp/models/ggml-tiny.en.bin -f test.wav -otxt");
+            std::vector&lt;std::string> targets = {"turn on lights", "turn off lights", "turn light red", "turn light green", "turn light blue", "boogie bomb", "What the sigma", "play young boy", "play beethoven", "set 10 second timer", "turn on fan", "turn off fan", "relax nature", "relax rain"};
+            std::vector&lt;std::string> closestMatches(targets.size());
+            std::vector&lt;int> minDistances(targets.size(), 9999999);
+
+            std::ifstream file("test.wav.txt");
+            if (file.is_open()) {
+                std::string line;
+                while (getline(file, line)) {
+                    for (int i = 0; i &lt; targets.size(); i++) {
+                        int distance = levenshteinDistance(targets[i], line);
+                        if (distance &lt; minDistances[i]) {
+                            minDistances[i] = distance;
+                            closestMatches[i] = line;
+                        }
+                    }
+                }
+                file.close();
+            } else {
+                std::cout &lt;&lt; "Unable to open file";
+            }
+
+            int closestTargetIndex = 0;
+            for (int i = 1; i &lt; targets.size(); i++) {
+                if (minDistances[i] &lt; minDistances[closestTargetIndex]) {
+                    closestTargetIndex = i;
+                }
+            }
+            play_wav_file("test.wav");
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            play_wav_file("ok.wav");
+            // TURN ON LIGHT
+            if (closestTargetIndex == 0) {
+                std::cout &lt;&lt; "The closest match is '" &lt;&lt; closestMatches[closestTargetIndex] &lt;&lt; "', which corresponds to the target '" &lt;&lt; targets[closestTargetIndex] &lt;&lt; "'. Performing the corresponding action..." &lt;&lt; std::endl;
+                std::cout &lt;&lt; "TURNING ON THE LIGHTS" &lt;&lt; std::endl;
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Turning On Light");
+                digitalWrite(RLED, 1);
+                digitalWrite(GLED, 1);
+                digitalWrite(BLED, 1);
+                // Perform the action corresponding to targets[0] here
+            // TURN OFF LIGHT
+            } else if (closestTargetIndex == 1) {
+                std::cout &lt;&lt; "The closest match is '" &lt;&lt; closestMatches[closestTargetIndex] &lt;&lt; "', which corresponds to the target '" &lt;&lt; targets[closestTargetIndex] &lt;&lt; "'. Performing the corresponding action..." &lt;&lt; std::endl;
+                std::cout &lt;&lt; "TURNING OFF THE LIGHTS" &lt;&lt; std::endl;
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Turning Off Light");
+                digitalWrite(RLED, 0);
+                digitalWrite(GLED, 0);
+                digitalWrite(BLED, 0);
+            } 
+            // TURN LIGHT RED
+            else if (closestTargetIndex == 2) {
+                std::cout &lt;&lt; "The closest match is '" &lt;&lt; closestMatches[closestTargetIndex] &lt;&lt; "', which corresponds to the target '" &lt;&lt; targets[closestTargetIndex] &lt;&lt; "'. Performing the corresponding action..." &lt;&lt; std::endl;
+                // Perform the action corresponding to targets[1] here
+                std::cout &lt;&lt; "TURNING LIGHT RED" &lt;&lt; std::endl;
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Turning light Red");
+                digitalWrite(RLED, 1);
+                digitalWrite(GLED, 0);
+                digitalWrite(BLED, 0);
+            }
+            // TURN LIGHT GREEN
+            else if (closestTargetIndex == 3) {
+                std::cout &lt;&lt; "The closest match is '" &lt;&lt; closestMatches[closestTargetIndex] &lt;&lt; "', which corresponds to the target '" &lt;&lt; targets[closestTargetIndex] &lt;&lt; "'. Performing the corresponding action..." &lt;&lt; std::endl;
+                std::cout &lt;&lt; "TURNING LIGHT GREEN" &lt;&lt; std::endl;
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Turning light Green");
+                digitalWrite(RLED, 0);
+                digitalWrite(GLED, 1);
+                digitalWrite(BLED, 0);
+            // TURN LIGHT BLUE
+            } else if (closestTargetIndex == 4) {
+                std::cout &lt;&lt; "The closest match is '" &lt;&lt; closestMatches[closestTargetIndex] &lt;&lt; "', which corresponds to the target '" &lt;&lt; targets[closestTargetIndex] &lt;&lt; "'. Performing the corresponding action..." &lt;&lt; std::endl;
+                std::cout &lt;&lt; "TURNING LIGHT BLUE" &lt;&lt; std::endl;
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Turning light Blue");
+                digitalWrite(RLED, 0);
+                digitalWrite(GLED, 0);
+                digitalWrite(BLED, 1);
+            // BOOGIE BOMB
+            } else if (closestTargetIndex == 5) {
+                std::cout &lt;&lt; "The closest match is '" &lt;&lt; closestMatches[closestTargetIndex] &lt;&lt; "', which corresponds to the target '" &lt;&lt; targets[closestTargetIndex] &lt;&lt; "'. Performing the corresponding action..." &lt;&lt; std::endl;
+                std::cout &lt;&lt; "BOOGIE BOMB" &lt;&lt; std::endl;
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Boogie Bomb!");
+                digitalWrite(RLED, 1);
+                digitalWrite(GLED, 0);
+                digitalWrite(BLED, 1);
+                std::thread audioThread([](){
+                    system("mpg123 ./boogieBomb.mp3");
+                });
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                digitalWrite(RLED, 1);
+                digitalWrite(GLED, 1);
+                digitalWrite(BLED, 1);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                digitalWrite(RLED, 0);
+                digitalWrite(GLED, 1);
+                digitalWrite(BLED, 1);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                digitalWrite(RLED, 1);
+                digitalWrite(GLED, 0);
+                digitalWrite(BLED, 0);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                digitalWrite(RLED, 0);
+                digitalWrite(GLED, 1);
+                digitalWrite(BLED, 0);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                digitalWrite(RLED, 1);
+                digitalWrite(GLED, 0);
+                digitalWrite(BLED, 1);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                digitalWrite(RLED, 0);
+                digitalWrite(GLED, 0);
+                digitalWrite(BLED, 0);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                digitalWrite(RLED, 1);
+                digitalWrite(GLED, 0);
+                digitalWrite(BLED, 1);
+                std::thread audioThread2([](){
+                    system("mpg123 ./boogieBomb.mp3");
+                });
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                digitalWrite(RLED, 1);
+                digitalWrite(GLED, 1);
+                digitalWrite(BLED, 1);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                digitalWrite(RLED, 0);
+                digitalWrite(GLED, 1);
+                digitalWrite(BLED, 1);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                digitalWrite(RLED, 1);
+                digitalWrite(GLED, 0);
+                digitalWrite(BLED, 0);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                digitalWrite(RLED, 0);
+                digitalWrite(GLED, 1);
+                digitalWrite(BLED, 0);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                digitalWrite(RLED, 1);
+                digitalWrite(GLED, 0);
+                digitalWrite(BLED, 1);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                digitalWrite(RLED, 0);
+                digitalWrite(GLED, 0);
+                digitalWrite(BLED, 0);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+            // What the Sigma
+            else if (closestTargetIndex == 6) {
+                std::cout &lt;&lt; "The closest match is '" &lt;&lt; closestMatches[closestTargetIndex] &lt;&lt; "', which corresponds to the target '" &lt;&lt; targets[closestTargetIndex] &lt;&lt; "'. Performing the corresponding action..." &lt;&lt; std::endl;
+                std::cout &lt;&lt; "WHAT THE SIGMA" &lt;&lt; std::endl;
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "WHAT THE SIGMA");
+                system("mpg123 ./sigma.mp3");
+                system("mpg123 ./laugh.mp3");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+            // Play youngboy
+            else if (closestTargetIndex == 7) {
+                std::cout &lt;&lt; "The closest match is '" &lt;&lt; closestMatches[closestTargetIndex] &lt;&lt; "', which corresponds to the target '" &lt;&lt; targets[closestTargetIndex] &lt;&lt; "'. Performing the corresponding action..." &lt;&lt; std::endl;
+                std::cout &lt;&lt; "Play Youngboy" &lt;&lt; std::endl;
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "I feel like Im");
+                lcdPosition(lcd, 0, 1);
+                lcdPrintf(lcd, "Gucci Mane 2006");
+                system("mpg123 ./youngBoy.mp3");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+            // play beethoven
+            else if (closestTargetIndex == 8) {
+                std::cout &lt;&lt; "The closest match is '" &lt;&lt; closestMatches[closestTargetIndex] &lt;&lt; "', which corresponds to the target '" &lt;&lt; targets[closestTargetIndex] &lt;&lt; "'. Performing the corresponding action..." &lt;&lt; std::endl;
+                std::cout &lt;&lt; "Play Youngboy" &lt;&lt; std::endl;
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Playing Fur");
+                lcdPosition(lcd, 0, 1);
+                lcdPrintf(lcd, "Elise");
+                system("mpg123 ./beytoven.mp3");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+            // 10 Second Timer
+            else if (closestTargetIndex == 9) {
+                std::cout &lt;&lt; "The closest match is '" &lt;&lt; closestMatches[closestTargetIndex] &lt;&lt; "', which corresponds to the target '" &lt;&lt; targets[closestTargetIndex] &lt;&lt; "'. Performing the corresponding action..." &lt;&lt; std::endl;
+                std::cout &lt;&lt; "Setting 10 Second Timer" &lt;&lt; std::endl;
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Timer:");
+                lcdPosition(lcd, 0, 1);
+                lcdPrintf(lcd, "10");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Timer:");
+                lcdPosition(lcd, 0, 1);
+                lcdPrintf(lcd, "9");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Timer:");
+                lcdPosition(lcd, 0, 1);
+                lcdPrintf(lcd, "8");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Timer:");
+                lcdPosition(lcd, 0, 1);
+                lcdPrintf(lcd, "7");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Timer:");
+                lcdPosition(lcd, 0, 1);
+                lcdPrintf(lcd, "6");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Timer:");
+                lcdPosition(lcd, 0, 1);
+                lcdPrintf(lcd, "5");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Timer:");
+                lcdPosition(lcd, 0, 1);
+                lcdPrintf(lcd, "4");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Timer:");
+                lcdPosition(lcd, 0, 1);
+                lcdPrintf(lcd, "3");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Timer:");
+                lcdPosition(lcd, 0, 1);
+                lcdPrintf(lcd, "2");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Timer:");
+                lcdPosition(lcd, 0, 1);
+                lcdPrintf(lcd, "1");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Timer:");
+                lcdPosition(lcd, 0, 1);
+                lcdPrintf(lcd, "DONE!");
+                system("mpg123 ./iphoneAlarm.mp3");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+            // turn on fan
+            else if (closestTargetIndex == 10) {
+                std::cout &lt;&lt; "The closest match is '" &lt;&lt; closestMatches[closestTargetIndex] &lt;&lt; "', which corresponds to the target '" &lt;&lt; targets[closestTargetIndex] &lt;&lt; "'. Performing the corresponding action..." &lt;&lt; std::endl;
+                std::cout &lt;&lt; "Turining on Fan" &lt;&lt; std::endl;
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Fan ON");
+                digitalWrite(fanPin, 1);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }                                                                    
+            // turn off fan
+            else if (closestTargetIndex == 11) {
+                std::cout &lt;&lt; "The closest match is '" &lt;&lt; closestMatches[closestTargetIndex] &lt;&lt; "', which corresponds to the target '" &lt;&lt; targets[closestTargetIndex] &lt;&lt; "'. Performing the corresponding action..." &lt;&lt; std::endl;
+                std::cout &lt;&lt; "Turining off Fan" &lt;&lt; std::endl;
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Fan OFF");
+                digitalWrite(fanPin, 0);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+            // Relaxing nature
+            else if (closestTargetIndex == 12) {
+                std::cout &lt;&lt; "The closest match is '" &lt;&lt; closestMatches[closestTargetIndex] &lt;&lt; "', which corresponds to the target '" &lt;&lt; targets[closestTargetIndex] &lt;&lt; "'. Performing the corresponding action..." &lt;&lt; std::endl;
+                std::cout &lt;&lt; "Relax Nature" &lt;&lt; std::endl;
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Relaxation");
+                digitalWrite(RLED, 0);
+                digitalWrite(GLED, 1);
+                digitalWrite(BLED, 0);
+                digitalWrite(fanPin, 1);
+                system("mpg123 ./bird.mp3");
+                digitalWrite(fanPin, 0);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+            // Relaxing rain
+            else if (closestTargetIndex == 13) {
+                std::cout &lt;&lt; "The closest match is '" &lt;&lt; closestMatches[closestTargetIndex] &lt;&lt; "', which corresponds to the target '" &lt;&lt; targets[closestTargetIndex] &lt;&lt; "'. Performing the corresponding action..." &lt;&lt; std::endl;
+                std::cout &lt;&lt; "Relax Nature" &lt;&lt; std::endl;
+                lcdClear(lcd);
+                lcdPosition(lcd, 0, 0);
+                lcdPrintf(lcd, "Enjoy this nice");
+                lcdPosition(lcd, 0, 1);
+                lcdPrintf(lcd, "rain sound -B+C");
+                digitalWrite(RLED, 0);
+                digitalWrite(GLED, 0);
+                digitalWrite(BLED, 1);
+                digitalWrite(fanPin, 1);
+                system("mpg123 ./rain.mp3");
+                digitalWrite(fanPin, 0);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+            else {
+                std::cout &lt;&lt; "The closest match is '" &lt;&lt; closestMatches[closestTargetIndex] &lt;&lt; "' with a Levenshtein distance of " &lt;&lt; minDistances[closestTargetIndex] &lt;&lt; std::endl;
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            lcdClear(lcd);
+            lcdPosition(lcd, 0, 0);
+            lcdPrintf(lcd, "Press the button");
+            lcdPosition(lcd, 0, 1);
+            lcdPrintf(lcd, "and say command");
+        }
+
+
+        void buttonChanged() {
+            static uint32_t previousTimeButtonChanged = 0;
+            uint32_t currentTime = millis(); // wiringPi's millis() function replaces the tick parameter
+            int level = digitalRead(Button);
+            if (currentTime - previousTimeButtonChanged > 5000) {
+                if (level == 0) {
+                    std::cout &lt;&lt; "Button pressed." &lt;&lt; std::endl;
+                    start_main_listen();
+                } else if (level == 1) {
+                    std::cout &lt;&lt; "Button released." &lt;&lt; std::endl;
+                }
+            previousTimeButtonChanged = currentTime;
+            }
+        }
+
+        int main() {
+            int wiringSetup = wiringPiSetup();
+            int lcd = lcdInit (2, 16, 4, LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7, 0, 0, 0, 0);
+            lcdClear(lcd);
+            std::cout &lt;&lt; "DEBUG: " &lt;&lt; wiringSetup &lt;&lt; std::endl;
+            pinMode(Button, INPUT);
+            pinMode(RLED, OUTPUT);
+            pinMode(GLED, OUTPUT);
+            pinMode(BLED, OUTPUT);
+            pinMode(fanPin, OUTPUT);
+            pullUpDnControl(Button, PUD_UP);
+            wiringPiISR(Button, INT_EDGE_BOTH, buttonChanged);
+            signal(SIGINT, sigint_handler);
+            lcdPosition(lcd, 0, 0);
+            lcdPrintf(lcd, "Press the button");
+            lcdPosition(lcd, 0, 1);
+            lcdPrintf(lcd, "and say command");
+            std::cout &lt;&lt; "Press CTRL-C to exit." &lt;&lt; std::endl;
+            while (!signal_received);
+            std::cout &lt;&lt; std::endl;
+        return 0;
+        }
+
+        // g++ -Wall -o loop loop.cpp -lwiringPi -lao -lsndfile -lpthread -lwiringPiDev
+        // RUN USING ./loop
+        </code></pre>
     </div>
 </body>
 </html>
